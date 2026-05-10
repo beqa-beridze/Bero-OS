@@ -1,0 +1,8 @@
+# Begin /etc/fstab
+
+# file system                              mount-point  type   options    dump  fsck
+
+UUID=d9ac6b92-5e02-432b-b579-978886647a81  /            ext4   defaults   1     1
+UUID=b50b8f10-8af9-4c96-b178-105c27c49f7b  none         swap   sw         0     0
+
+# End /etc/fstab
