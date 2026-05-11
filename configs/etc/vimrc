@@ -1,0 +1,9 @@
+" Begin /etc/vimrc
+set nocompatible
+set backspace=2
+set mouse=
+syntax on
+if (&term == "xterm") || (&term == "putty")
+  set background=dark
+endif
+" End /etc/vimrc
