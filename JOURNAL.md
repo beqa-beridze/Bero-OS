@@ -21,3 +21,11 @@ for our use case (HTTPS API client + git transport).
 Replaced LFS-built vim with BLFS vim 9.2.0078 (Huge feature set, ncursesw, no GUI).
 Added `/etc/vimrc` with minimal sane defaults (nocompatible, backspace=2, syntax on,
 dark bg in xterm/putty). Symlinked `vi → vim` and all locale `vi.1` man pages.
+
+### BLFS batch: git
+
+Installed git 2.53.0 (`--with-libpcre2`, `--with-python=python3`,
+`perllibdir=/usr/lib/perl5/5.42/site_perl`). HTTPS+TLS path smoke-tested against
+public github.com (ls-remote returned HEAD). Seeded `/etc/gitconfig` with
+`init.defaultBranch=main`, `pull.ff=only`, `push.autoSetupRemote=true` —
+no user identity baked in (left for `~/.gitconfig`).
