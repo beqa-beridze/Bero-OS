@@ -19,3 +19,7 @@ Did another batch right after. 17 packages this time — cmake and nasm so the c
 One hiccup: glib wanted Python docutils for its man pages. Just turned man-pages off, nothing important lost.
 
 Also had CC download the BLFS book locally so it stops hitting the web for every page. Sits in `context/`, gitignored.
+
+Quick cleanup batch before starting X11. Installed rsync so I have a proper sync tool. Installed docutils via pip — last batch needed it for glib man pages and I skipped them. Now it's available so future packages get their docs. Also rebuilt curl with libpsl since libpsl exists now (last batch curl was built without it because libpsl wasn't installed yet).
+
+Also: decided to switch the endgame DE from KDE Plasma to XFCE. GTK3-based, simpler, fits the AI co-driver idea better than Plasma's complexity. Foundation libs are toolkit-agnostic so nothing to redo.
