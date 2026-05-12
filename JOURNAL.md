@@ -49,3 +49,23 @@ Phase A done: glib 3-pass rebuild with introspection enabled, gobject-introspect
 Phase B1 done: shared-mime-info, gdk-pixbuf (with `-D glycin=disabled` because glycin-2 isn't installed), gsettings-desktop-schemas, at-spi2-core.
 
 Phase B2 in progress: Rust 1.93.1 toolchain, ~1.5 hrs in, ~30-60 min to go before librsvg can build.
+
+Eventually finished the whole batch. Total ~10 hrs CC-wall-clock. Bigger surprises:
+
+- harfbuzz and pango both had to be rebuilt with introspection enabled (they were built without it back in batch 2 because glib was missing introspection then). gtk3 wouldn't build without their .gir files.
+- Mesa surprise from last batch hit again here too — anything wanting introspection has to wait until glib has it. Built up a stack of small rebuilds because of this.
+- The /usr/lib64 quirk: glib, gobject-introspection, gtk3 and most things ended up installing pkgconfig and typelibs into /usr/lib64 instead of /usr/lib. Wrote /etc/profile.d/pkg-config-lib64.sh to handle that for downstream builds.
+- gtk3 build fails on docbook man pages (xsltproc tries to fetch docbook.xsl over the network). Set `-D man=false`. Same trick for xfce4-terminal, libsecret, others — they all hit this. xfce4-terminal had no flag to disable man pages, so I skipped that whole package — xterm from batch 3 is the terminal for now.
+- vte wanted gnutls. Skipped gnutls (it's a big build) — disabled vte's gnutls support with `-D gnutls=false`.
+- gcr wanted gpg2 binary just to configure. Stubbed gpg2 with an exit-0 script so gcr's configure passes. gcr's gpg-using features won't work at runtime but they're not needed for XFCE to come up.
+- accountsservice tests wanted Python dbus and PyGObject — patched out the tests subdir entirely.
+- libxml2 needed a rebuild with Python bindings for itstool (which lightdm needs). That dragged in doxygen as a build dep.
+- iso-codes + libxklavier needed for lightdm even after thinking I'd skip them.
+- Dropped gvfs and the whole udisks chain. Too much yak shaving (gvfs needs libsoup needs glib-networking needs gnutls). Means no removable-media handling in thunar yet. Can add later as a one-off batch.
+- xfce4-terminal also dropped (docbook man). Skipped a Python pip-install rabbit hole too — installed mako, PyYAML, markdown, pygments, typogrify, lxml, dbus-python as we went.
+
+End state: full XFCE session with xfwm4 + xfce4-panel + xfdesktop + xfce4-session + xfce4-settings + thunar + mousepad + xfce4-appfinder. LightDM autologins as root into xfce. /etc/pam.d/lightdm symlinks to system-auth.
+
+To test: reboot the X230. It should boot through TTY → lightdm → autologin → XFCE desktop. If something fails, drop to TTY (Ctrl+Alt+F2) and check `journalctl -u lightdm -b --no-pager` or `cat ~/.xsession-errors`.
+
+Audio still parked. gvfs deferred. xfce4-terminal deferred.
