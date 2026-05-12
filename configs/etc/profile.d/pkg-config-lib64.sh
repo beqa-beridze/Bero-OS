@@ -1,0 +1,3 @@
+PKG_CONFIG_PATH=${PKG_CONFIG_PATH:+$PKG_CONFIG_PATH:}/usr/lib64/pkgconfig
+GI_TYPELIB_PATH=${GI_TYPELIB_PATH:+$GI_TYPELIB_PATH:}/usr/lib64/girepository-1.0:/usr/lib/girepository-1.0
+export PKG_CONFIG_PATH GI_TYPELIB_PATH

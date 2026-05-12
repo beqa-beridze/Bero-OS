@@ -39,3 +39,13 @@ End state: full X11 stack — Xorg-server 21.1.21 with glamor + modesetting, Mes
 Audio still not working — diagnosed as missing kernel codec module (CONFIG_SND_HDA_CODEC_REALTEK or similar), not firmware. Needs a kernel rebuild session, parking it.
 
 Next session: GTK3, then XFCE itself, then LightDM.
+
+Started the GTK3 + XFCE + LightDM batch later in the day. CC running it while I'm at work.
+
+Phase 0 done: Linux-PAM 1.7.2 installed with minimal pam_unix system stacks. /etc/pam.d/ was empty before this so anything needing PAM (polkit, lightdm) is now ok.
+
+Phase A done: glib 3-pass rebuild with introspection enabled, gobject-introspection 1.86.0 installed. Took a few tries because of two bero-os quirks: `ldd` was broken (linker symlink at the wrong path — fixed), and gobject-introspection installed pc files in /usr/lib64/pkgconfig but pkg-config only searched /usr/lib/pkgconfig (added a profile.d script).
+
+Phase B1 done: shared-mime-info, gdk-pixbuf (with `-D glycin=disabled` because glycin-2 isn't installed), gsettings-desktop-schemas, at-spi2-core.
+
+Phase B2 in progress: Rust 1.93.1 toolchain, ~1.5 hrs in, ~30-60 min to go before librsvg can build.
