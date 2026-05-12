@@ -1,0 +1,7 @@
+#!/bin/bash
+# Minimal lightdm session wrapper for Bero-OS
+# Launches the session under a fresh DBus session bus (XFCE needs this).
+[ -r /etc/profile ] && . /etc/profile
+[ -r "$HOME/.profile" ] && . "$HOME/.profile"
+[ -r "$HOME/.bash_profile" ] && . "$HOME/.bash_profile"
+exec dbus-run-session -- "$@"

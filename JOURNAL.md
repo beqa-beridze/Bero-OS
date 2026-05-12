@@ -69,3 +69,13 @@ End state: full XFCE session with xfwm4 + xfce4-panel + xfdesktop + xfce4-sessio
 To test: reboot the X230. It should boot through TTY → lightdm → autologin → XFCE desktop. If something fails, drop to TTY (Ctrl+Alt+F2) and check `journalctl -u lightdm -b --no-pager` or `cat ~/.xsession-errors`.
 
 Audio still parked. gvfs deferred. xfce4-terminal deferred.
+
+First reboot didn't actually bring up the desktop. Two real bugs:
+
+1. gdk-pixbuf in batch 4 was built with `-D png=disabled -D gif=disabled -D jpeg=disabled -D tiff=disabled` (I'd assumed it would use system libpng/etc at runtime). It does NOT — those flags disable the gdk-pixbuf image-loader MODULES, so GTK can't load any image at all even with libpng installed. Greeter crashed on the first icon. Rebuilt gdk-pixbuf with all loaders enabled, fix landed in commit 1c26d13 → fcab940 chain.
+
+2. lightdm's `make install` doesn't ship the `lightdm-session` wrapper script that `session-wrapper=/usr/bin/lightdm-session` (the default) expects. Every session attempt exited 1 in 20ms before the wrapper even ran. Wrote a minimal wrapper at /usr/bin/lightdm-session that sources /etc/profile and runs the session under `dbus-run-session` (XFCE needs the session bus or xfconf can't start). After installing the wrapper, autologin worked and XFCE came up.
+
+Captured both lessons in `configs/build-notes/gdk-pixbuf.md` and `configs/build-notes/lightdm.md` for next time.
+
+Also fixed sshd which was running by hand (no systemd unit). Wrote /etc/systemd/system/sshd.service so it survives reboots — that bit me during the post-batch-4 recovery when sshd never came back up after reboot.
