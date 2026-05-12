@@ -70,12 +70,14 @@ To test: reboot the X230. It should boot through TTY → lightdm → autologin �
 
 Audio still parked. gvfs deferred. xfce4-terminal deferred.
 
-First reboot didn't actually bring up the desktop. Two real bugs:
+Tried rebooting and the desktop didn't come up. Spent a while debugging with CC. Two real bugs.
 
-1. gdk-pixbuf in batch 4 was built with `-D png=disabled -D gif=disabled -D jpeg=disabled -D tiff=disabled` (I'd assumed it would use system libpng/etc at runtime). It does NOT — those flags disable the gdk-pixbuf image-loader MODULES, so GTK can't load any image at all even with libpng installed. Greeter crashed on the first icon. Rebuilt gdk-pixbuf with all loaders enabled, fix landed in commit 1c26d13 → fcab940 chain.
+First, gdk-pixbuf was built with all the image-loader flags disabled — turns out those aren't optional, they're how GTK loads PNGs and JPEGs at all. Without them GTK can't load any icon, the greeter crashes on the first one it tries to draw. Rebuilt gdk-pixbuf with all the loaders on.
 
-2. lightdm's `make install` doesn't ship the `lightdm-session` wrapper script that `session-wrapper=/usr/bin/lightdm-session` (the default) expects. Every session attempt exited 1 in 20ms before the wrapper even ran. Wrote a minimal wrapper at /usr/bin/lightdm-session that sources /etc/profile and runs the session under `dbus-run-session` (XFCE needs the session bus or xfconf can't start). After installing the wrapper, autologin worked and XFCE came up.
+Second, lightdm's `make install` skips the `lightdm-session` wrapper script. Lightdm tries to run it for every session and exits in milliseconds when it isn't there. Wrote a tiny wrapper that sources /etc/profile and execs the session under dbus-run-session (XFCE needs a session bus). With that in place the autologin worked and the desktop showed up.
 
-Captured both lessons in `configs/build-notes/gdk-pixbuf.md` and `configs/build-notes/lightdm.md` for next time.
+Wrote both up in `configs/build-notes/` so I don't repeat the mistakes.
 
-Also fixed sshd which was running by hand (no systemd unit). Wrote /etc/systemd/system/sshd.service so it survives reboots — that bit me during the post-batch-4 recovery when sshd never came back up after reboot.
+Also: sshd was running by hand on every boot with no systemd unit. That bit me when bero-os rebooted and SSH never came back. Wrote /etc/systemd/system/sshd.service properly. Now SSH survives reboots.
+
+Saw the XFCE desktop for the first time today.
