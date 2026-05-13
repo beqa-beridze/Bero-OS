@@ -1,0 +1,4 @@
+# /etc/pam.d/sudo — uses the system-auth/account/session stacks
+auth     include   system-auth
+account  include   system-account
+session  include   system-session

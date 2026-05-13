@@ -1,0 +1,12 @@
+# /etc/sudoers — minimal Bero-OS configuration
+# Edit only with visudo(8).
+
+Defaults secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Defaults env_reset
+Defaults mail_badpass
+Defaults timestamp_timeout=10
+
+root  ALL=(ALL:ALL) ALL
+%wheel ALL=(ALL:ALL) ALL
+
+@includedir /etc/sudoers.d

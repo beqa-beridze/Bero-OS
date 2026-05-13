@@ -81,3 +81,7 @@ Wrote both up in `configs/build-notes/` so I don't repeat the mistakes.
 Also: sshd was running by hand on every boot with no systemd unit. That bit me when bero-os rebooted and SSH never came back. Wrote /etc/systemd/system/sshd.service properly. Now SSH survives reboots.
 
 Saw the XFCE desktop for the first time today.
+
+## 2026-05-13
+
+Got XFCE booting today. Hit two surprise bugs at first boot — gdk-pixbuf was built without image loaders so the greeter couldn't draw, and lightdm 1.32.0 doesn't ship the session wrapper so we wrote our own. Both fixed. First time bero-os has a real desktop. 3am, going to sleep.
