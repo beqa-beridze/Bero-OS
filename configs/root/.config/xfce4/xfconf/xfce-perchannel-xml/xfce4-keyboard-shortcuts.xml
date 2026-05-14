@@ -36,7 +36,7 @@
         <property name="startup-notify" type="bool" value="true"/>
       </property>
       <property name="&lt;Alt&gt;Print" type="string" value="xfce4-screenshooter -w"/>
-      <property name="&lt;Super&gt;r" type="string" value="xfce4-appfinder -c">
+      <property name="&lt;Super&gt;r" type="string" value="xfce4-appfinder">
         <property name="startup-notify" type="bool" value="true"/>
       </property>
       <property name="XF86WWW" type="string" value="exo-open --launch WebBrowser"/>
@@ -60,6 +60,8 @@
       <property name="HomePage" type="string" value="exo-open --launch WebBrowser"/>
       <property name="XF86Display" type="string" value="xfce4-display-settings --minimal"/>
       <property name="override" type="bool" value="true"/>
+      <property name="&lt;Super&gt;Return" type="string" value="xfce4-terminal"/>
+      <property name="&lt;Super&gt;l" type="string" value="xflock4"/>
     </property>
   </property>
   <property name="xfwm4" type="empty">
@@ -187,6 +189,10 @@
       <property name="&lt;Alt&gt;Insert" type="string" value="add_workspace_key"/>
       <property name="&lt;Primary&gt;F1" type="string" value="workspace_1_key"/>
       <property name="override" type="bool" value="true"/>
+      <property name="&lt;Super&gt;Left" type="string" value="tile_left_key"/>
+      <property name="&lt;Super&gt;Right" type="string" value="tile_right_key"/>
+      <property name="&lt;Super&gt;Up" type="string" value="maximize_window_key"/>
+      <property name="&lt;Super&gt;Down" type="string" value="hide_window_key"/>
     </property>
   </property>
   <property name="providers" type="array">

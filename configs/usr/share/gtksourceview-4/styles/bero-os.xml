@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Bero-OS Workshop GtkSourceView color scheme.
+  Used by mousepad and any GtkSourceView 4 consumer.
+  Brand: paper-on-near-black, accent #c8102e single-purpose (cursor only).
+-->
+<style-scheme id="bero-workshop" _name="Bero-OS Workshop" version="1.0">
+  <author>Bero</author>
+  <description>Bero-OS Workshop palette — paper text on warm near-black, ThinkPad-red cursor</description>
+
+  <!-- Palette as named colors -->
+  <color name="ground"   value="#0f0e0c"/>
+  <color name="surface"  value="#17150f"/>
+  <color name="hairline" value="#2a2620"/>
+  <color name="paper"    value="#e9dcc1"/>
+  <color name="mid"      value="#7a7468"/>
+  <color name="dim"      value="#4a463e"/>
+  <color name="accent"   value="#c8102e"/>
+  <color name="paper-bright" value="#f5ecd6"/>
+
+  <!-- Editor frame -->
+  <style name="text"                        foreground="paper" background="ground"/>
+  <style name="background-pattern"          background="surface"/>
+  <style name="cursor"                      foreground="accent"/>
+  <style name="secondary-cursor"            foreground="mid"/>
+  <style name="current-line"                background="surface"/>
+  <style name="current-line-number"         background="surface" foreground="paper"/>
+  <style name="line-numbers"                background="ground" foreground="dim"/>
+  <style name="line-numbers-border"         background="hairline"/>
+  <style name="selection"                   background="hairline" foreground="paper-bright"/>
+  <style name="selection-unfocused"         background="hairline" foreground="mid"/>
+  <style name="right-margin"                foreground="hairline" background="hairline"/>
+  <style name="draw-spaces"                 foreground="dim"/>
+  <style name="bracket-match"               foreground="accent" bold="true"/>
+  <style name="bracket-mismatch"            foreground="accent" background="surface" bold="true"/>
+  <style name="search-match"                background="dim" foreground="paper-bright"/>
+  <style name="map-overlay"                 background="surface"/>
+
+  <!-- Common syntax (paper variants only — accent stays out of code per brand) -->
+  <style name="def:keyword"                 foreground="mid" bold="true"/>
+  <style name="def:builtin"                 foreground="mid"/>
+  <style name="def:type"                    foreground="paper" bold="true"/>
+  <style name="def:function"                foreground="paper"/>
+  <style name="def:identifier"              foreground="paper"/>
+  <style name="def:variable"                foreground="paper"/>
+  <style name="def:constant"                foreground="paper" bold="true"/>
+  <style name="def:special-constant"        foreground="paper" bold="true"/>
+  <style name="def:boolean"                 foreground="paper" bold="true"/>
+  <style name="def:number"                  foreground="paper"/>
+  <style name="def:floating-point"          foreground="paper"/>
+  <style name="def:string"                  foreground="mid"/>
+  <style name="def:special-char"            foreground="mid" bold="true"/>
+  <style name="def:character"               foreground="mid"/>
+  <style name="def:comment"                 foreground="dim" italic="true"/>
+  <style name="def:doc-comment"             foreground="dim" italic="true"/>
+  <style name="def:doc-comment-element"     foreground="dim" italic="true"/>
+  <style name="def:shebang"                 foreground="dim" italic="true"/>
+  <style name="def:preprocessor"            foreground="mid"/>
+  <style name="def:operator"                foreground="paper"/>
+  <style name="def:statement"               foreground="paper"/>
+  <style name="def:warning"                 background="dim" foreground="paper"/>
+  <style name="def:error"                   foreground="accent" bold="true"/>
+  <style name="def:note"                    foreground="dim" italic="true"/>
+  <style name="def:underlined"              underline="single"/>
+  <style name="def:link-destination"        foreground="paper" underline="single"/>
+  <style name="def:link-text"               foreground="paper"/>
+  <style name="def:link-symbol"             foreground="mid"/>
+
+  <!-- Diff -->
+  <style name="diff:added-line"             background="surface" foreground="paper"/>
+  <style name="diff:removed-line"           background="surface" foreground="dim"/>
+  <style name="diff:changed-line"           background="surface" foreground="mid"/>
+  <style name="diff:diff-file"              foreground="paper-bright" bold="true"/>
+  <style name="diff:location"               foreground="mid"/>
+
+  <!-- Markdown -->
+  <style name="markdown:header"             foreground="paper-bright" bold="true"/>
+  <style name="markdown:list-marker"        foreground="mid"/>
+  <style name="markdown:emphasis"           italic="true"/>
+  <style name="markdown:strong-emphasis"    bold="true"/>
+  <style name="markdown:code"               foreground="mid"/>
+  <style name="markdown:link-text"          foreground="paper"/>
+  <style name="markdown:url"                foreground="mid" underline="single"/>
+  <style name="markdown:blockquote-marker"  foreground="dim"/>
+  <style name="markdown:horizontal-rule"    foreground="hairline"/>
+</style-scheme>

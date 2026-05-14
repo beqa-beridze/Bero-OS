@@ -1,0 +1,261 @@
+#!/bin/bash
+# bero — Bero-OS CLI
+# two prompts. one shell.
+
+set -u
+
+readonly VERSION="0.1.0"
+readonly KIT_DIR="/usr/local/share/bero-os"
+readonly WISDOM="${KIT_DIR}/workshop-wisdom.txt"
+readonly KOAN="${KIT_DIR}/koan.txt"
+
+# Workshop palette ANSI escapes
+readonly R=$'\033[38;2;200;16;46m'    # accent
+readonly P=$'\033[38;2;233;220;193m'  # paper
+readonly M=$'\033[38;2;122;116;104m'  # mid
+readonly D=$'\033[38;2;74;70;62m'     # dim
+readonly X=$'\033[0m'
+
+# --- helpers ---
+
+_mark() {
+    # The two-cursor mark, ASCII
+    printf '%s▮%s %s▯%s\n' "$R" "$X" "$P" "$X"
+}
+
+_tagline() {
+    printf '%stwo prompts. one shell.%s\n' "$M" "$X"
+}
+
+_kv() {
+    # key:  value
+    printf '  %s%-12s%s %s\n' "$M" "$1" "$X" "$2"
+}
+
+_rule() {
+    printf '%s────────────────────────────%s\n' "$D" "$X"
+}
+
+_wisdom_one() {
+    [ -r "$WISDOM" ] || { echo "(no wisdom file)"; return; }
+    shuf -n 1 "$WISDOM" 2>/dev/null
+}
+
+# --- public commands ---
+
+cmd_help() {
+    cat <<EOF
+${P}bero${X} ${M}— Bero-OS CLI${X}
+
+  ${P}bero${X} ${M}<command>${X}
+
+commands:
+  ${P}info${X}        system overview
+  ${P}version${X}     bero CLI version
+  ${P}batches${X}     show JOURNAL batch summary
+  ${P}art${X}         logo mark
+  ${P}fortune${X}     a workshop wisdom line
+  ${P}palette${X}     show the Workshop palette
+  ${P}wisdom${X}      all wisdom lines
+  ${P}help${X}        this message
+EOF
+}
+
+cmd_version() {
+    printf '%sbero%s %s\n' "$P" "$X" "$VERSION"
+}
+
+cmd_info() {
+    local kernel uptime mem_total mem_used hostname distro
+    kernel=$(uname -r)
+    uptime=$(uptime -p 2>/dev/null | sed 's/^up //')
+    hostname=$(hostname)
+    distro="bero-os"
+    if command -v free >/dev/null 2>&1; then
+        local mem_line
+        mem_line=$(free -h | awk '/^Mem:/{print $3"/"$2}')
+        mem_used="${mem_line%/*}"
+        mem_total="${mem_line#*/}"
+    fi
+    _mark
+    _tagline
+    echo
+    _kv "host" "$hostname"
+    _kv "distro" "$distro"
+    _kv "kernel" "$kernel"
+    _kv "uptime" "$uptime"
+    [ -n "${mem_total:-}" ] && _kv "memory" "$mem_used / $mem_total"
+    echo
+}
+
+cmd_batches() {
+    local journal=/home/bero/Bero-OS/JOURNAL.md
+    if [ ! -r "$journal" ] && command -v ssh >/dev/null; then
+        # If we're on bero-os, the journal isn't present. Show a placeholder.
+        printf '%sno local JOURNAL.md (this is the laptop).%s\n' "$M" "$X"
+        printf '%sthe build history lives in the Bero-OS git repo on E16.%s\n' "$M" "$X"
+        return
+    fi
+    if [ -r "$journal" ]; then
+        grep -E "^## " "$journal" | sed "s/^## /  ${P}/; s/$/${X}/"
+    else
+        printf '%sno JOURNAL.md found.%s\n' "$M" "$X"
+    fi
+}
+
+cmd_art() {
+    cat <<EOF
+
+${R}      ▄▄▄▄${X}    ${P}┌──┐${X}
+${R}      ████${X}    ${P}│  │${X}     ${P}bero-os${X}
+${R}      ████${X}    ${P}│  │${X}     ${M}two prompts. one shell.${X}
+${R}      ████${X}    ${P}│  │${X}
+${R}      ▀▀▀▀${X}    ${P}└──┘${X}
+
+EOF
+}
+
+cmd_fortune() {
+    printf '  %s%s%s\n' "$M" "$(_wisdom_one)" "$X"
+}
+
+cmd_palette() {
+    echo
+    printf '  %s███%s ground    %s#0f0e0c%s\n'   "$D"  "$X" "$M" "$X"
+    printf '  %s███%s surface   %s#17150f%s\n'   "$D"  "$X" "$M" "$X"
+    printf '  %s███%s hairline  %s#2a2620%s\n'   "$D"  "$X" "$M" "$X"
+    printf '  %s███%s paper     %s#e9dcc1%s\n'   "$P"  "$X" "$M" "$X"
+    printf '  %s███%s mid       %s#7a7468%s\n'   "$M"  "$X" "$M" "$X"
+    printf '  %s███%s dim       %s#4a463e%s\n'   "$D"  "$X" "$M" "$X"
+    printf '  %s███%s accent    %s#c8102e%s\n'   "$R"  "$X" "$M" "$X"
+    echo
+}
+
+cmd_wisdom() {
+    if [ -r "$WISDOM" ]; then
+        while IFS= read -r line; do
+            printf '  %s%s%s\n' "$M" "$line" "$X"
+        done <"$WISDOM"
+    else
+        echo "no wisdom file"
+    fi
+}
+
+# --- hidden commands (eggs) ---
+
+cmd_secret_mark() {
+    # bero ▮
+    _mark
+    _tagline
+    printf '  %s%s%s\n' "$M" "$(_wisdom_one)" "$X"
+}
+
+cmd_secret_42() {
+    cat <<EOF
+
+  ${P}42${X}
+
+  ${M}this isn't the answer you're looking for.${X}
+  ${M}/usr/share/doc is.${X}
+
+EOF
+}
+
+cmd_secret_brain() {
+    cat <<EOF
+
+  ${R}▮${X}
+
+  ${M}the brain isn't wired in yet.${X}
+  ${M}that's the next batch.${X}
+
+EOF
+}
+
+cmd_secret_workshop() {
+    _mark
+    printf '%sentering workshop. type %sexit%s to leave.%s\n' "$M" "$P" "$M" "$X"
+    bash --rcfile <(cat <<EOF
+[ -r /etc/profile.d/bero-prompt.sh ] && . /etc/profile.d/bero-prompt.sh
+PS1="${R}▮${X} ${P}workshop${X} ${R}❯${X} "
+EOF
+)
+    printf '  %s%s%s\n' "$M" "$(_wisdom_one)" "$X"
+}
+
+cmd_secret_kernel() {
+    _kv "kernel"  "$(uname -r)"
+    _kv "machine" "$(uname -m)"
+    _kv "system"  "$(uname -s)"
+    _kv "node"    "$(uname -n)"
+    _kv "version" "$(uname -v)"
+}
+
+cmd_secret_boot() {
+    if command -v who >/dev/null; then
+        local boot
+        boot=$(who -b 2>/dev/null | sed 's/^[^a-zA-Z0-9]*//')
+        _kv "boot" "$boot"
+    fi
+    if command -v uptime >/dev/null; then
+        _kv "uptime" "$(uptime -p 2>/dev/null | sed 's/^up //')"
+    fi
+}
+
+cmd_secret_prompt() {
+    # bero ❯ — silently exits 0 (the agent acknowledging the operator)
+    exit 0
+}
+
+cmd_secret_about() {
+    cat <<EOF
+
+  ${R}▮${X} ${P}▯${X}  ${P}bero-os${X}
+       ${M}two prompts. one shell.${X}
+       ${M}built by hand on a 2012 thinkpad.${M}
+
+EOF
+}
+
+cmd_secret_motd() {
+    [ -r /etc/profile.d/bero-banner.sh ] && bash -c "XDG_SESSION_ID=motd-$$ . /etc/profile.d/bero-banner.sh"
+}
+
+cmd_secret_koan() {
+    if [ -r "$KOAN" ]; then
+        echo
+        printf '  %s%s%s\n' "$M" "$(cat "$KOAN")" "$X"
+        echo
+    fi
+}
+
+# --- dispatch ---
+
+case "${1:-help}" in
+    help|--help|-h)         cmd_help ;;
+    version|--version|-V)   cmd_version ;;
+    info)                   cmd_info ;;
+    batches)                cmd_batches ;;
+    art)                    cmd_art ;;
+    fortune)                cmd_fortune ;;
+    palette)                cmd_palette ;;
+    wisdom)                 cmd_wisdom ;;
+
+    # hidden / eggs
+    "▮"|mark)               cmd_secret_mark ;;
+    42)                     cmd_secret_42 ;;
+    brain)                  cmd_secret_brain ;;
+    workshop)               cmd_secret_workshop ;;
+    kernel)                 cmd_secret_kernel ;;
+    boot)                   cmd_secret_boot ;;
+    "❯")                    cmd_secret_prompt ;;
+    --about|about)          cmd_secret_about ;;
+    motd)                   cmd_secret_motd ;;
+    koan)                   cmd_secret_koan ;;
+
+    *)
+        printf '%sbero%s: unknown command %s%s%s\n' "$R" "$X" "$P" "$1" "$X" >&2
+        echo "try: bero help" >&2
+        exit 1
+        ;;
+esac

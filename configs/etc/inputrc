@@ -1,0 +1,39 @@
+# /etc/inputrc — Bero-OS readline polish
+
+# Allow the command prompt to wrap to the next line
+set horizontal-scroll-mode Off
+
+# 8-bit clean
+set meta-flag On
+set input-meta On
+set convert-meta Off
+set output-meta On
+
+# Tab completion ergonomics
+set show-all-if-ambiguous On
+set completion-ignore-case On
+set completion-prefix-display-length 3
+set colored-stats On
+set colored-completion-prefix On
+set visible-stats On
+set mark-symlinked-directories On
+set page-completions Off
+
+# History search via Up/Down (matches what's typed)
+"\e[A": history-search-backward
+"\e[B": history-search-forward
+"\eOA": history-search-backward
+"\eOB": history-search-forward
+
+# Better word-jump with Ctrl+arrows
+"\e[1;5C": forward-word
+"\e[1;5D": backward-word
+
+# Home/End in xterm + xfce4-terminal
+"\e[H": beginning-of-line
+"\e[F": end-of-line
+"\e[1~": beginning-of-line
+"\e[4~": end-of-line
+
+# Delete
+"\e[3~": delete-char

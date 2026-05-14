@@ -122,6 +122,33 @@ Wallpaper note for whoever does the brand v2 — the cursor order in the PNG is 
 
 Easter eggs in: TTY /etc/issue with the accent bar, /etc/motd ASCII for SSH, a first-shell brand banner in /etc/profile.d/bero-banner.sh that prints a random "workshop wisdom" line per session (sentinel in /tmp suppresses it after the first shell), xfce4-terminal title set to "▮ bero-os", and /etc/skel/ pre-baked with the brand prompt for any future user.
 
+## 2026-05-15
+
+XFCE polish pass. The default 2-panel + light-theme + drop-shadows everywhere look was straight out of 2009. Tightened it.
+
+Single top panel (28px), no bottom dock. All compositor shadows off (dock, frame, popup). Desktop icons off. Workshop palette consistent across xfce4-terminal, mousepad, GTK3 dialogs, and the xfwm4 title bars (the `bero-workshop` theme already had the right colors). Mousepad now has a `bero-workshop` GtkSourceView style installed at /usr/share/gtksourceview-4/styles/bero-os.xml — paper text on near-black, accent #c8102e on the cursor only (per brand: accent never as background).
+
+Thunar got a real config — detail view default, sort by name ascending, hidden files off, shortcuts pane (not the tree). And a custom action for "Open Terminal Here" + a "Workshop Wisdom" easter egg in the right-click menu.
+
+Window keybindings:
+- Super+Return → xfce4-terminal
+- Super+L → xflock4 (lock)
+- Super+E → thunar
+- Super+R → xfce4-appfinder
+- Super+Left/Right → tile half
+- Super+Up → maximize
+- Super+Down → minimize/hide
+
+Bash + readline polish in /etc/profile.d/bero-shell.sh + /etc/inputrc — sensible aliases (ll, la, grep --color, etc), 20k-line history with timestamps and dedup, case-insensitive completion, history-search via Up/Down, color completion, command_not_found_handle that prints a Workshop-styled hint.
+
+Power manager: dim-on-battery 14min, dim-on-AC 30min, blank screen at 5/10min, lid suspends regardless of AC.
+
+Added a `bero` CLI at /usr/local/bin/bero — public commands include `info`, `version`, `batches`, `art`, `fortune`, `palette`, `wisdom`, `help`. There are a few hidden subcommands too — find them yourself.
+
+Talked to Gemini for the boring file-format lookups (GtkSourceView XML schema, thunar uca format, xfwm4 action name verification). It got the GtkSourceView and thunar bits right first try; the xfwm4 tile action names I made it confirm with sources. Saved a couple iterations of trial-and-error.
+
+That's it.
+
 Couple of small ruts:
 
 xfce4-terminal upstream URL is .tar.xz, not .tar.bz2 as my old batch-4 note said. First wget hit a 404. Fixed and retried.

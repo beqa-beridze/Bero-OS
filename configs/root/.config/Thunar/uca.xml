@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+  <action>
+    <icon>utilities-terminal</icon>
+    <name>▮ Open Terminal Here</name>
+    <submenu></submenu>
+    <unique-id>bero-os-terminal-here</unique-id>
+    <command>xfce4-terminal --working-directory=%f</command>
+    <description>Open xfce4-terminal in this folder</description>
+    <range></range>
+    <patterns>*</patterns>
+    <startup-notify/>
+    <directories/>
+  </action>
+  <action>
+    <icon>edit-find-symbolic</icon>
+    <name>▮ Workshop Wisdom</name>
+    <submenu></submenu>
+    <unique-id>bero-os-wisdom</unique-id>
+    <command>xfce4-terminal --hold --command='/usr/local/bin/bero fortune'</command>
+    <description>Pull a Workshop wisdom line</description>
+    <range></range>
+    <patterns>*</patterns>
+    <startup-notify/>
+    <directories/>
+  </action>
+</actions>
