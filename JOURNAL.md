@@ -113,3 +113,21 @@ Laptop also got a new IP from DHCP (.5 instead of .2). Whatever, NM owns the con
 Finally fixed the /sbin PATH thing that's been deferred since batch 4. Two lines in /etc/profile.d/path.sh. Should have done it weeks ago.
 
 That's it.
+
+## 2026-05-14 (later)
+
+Brand kit is on the laptop. Wallpaper, palette in xfce4-terminal + GTK + xfwm4 borders, the two-cursor PS1, Red Hat Mono, LightDM greeter branding, and a handful of easter eggs. Plus xfce4-terminal itself — which batch 4 had to skip because xsltproc tried to fetch docbook XSL over the network. That got resolved as a side effect of installing docbook-xsl-nons during the NetworkManager mess in batch 5, so this time it built clean.
+
+Wallpaper note for whoever does the brand v2 — the cursor order in the PNG is swapped from the canonical mark. Logo SVG has red-filled-left, cream-outlined-right. The wallpapers have it the other way around. Living with it for now, flagged for re-export.
+
+Easter eggs in: TTY /etc/issue with the accent bar, /etc/motd ASCII for SSH, a first-shell brand banner in /etc/profile.d/bero-banner.sh that prints a random "workshop wisdom" line per session (sentinel in /tmp suppresses it after the first shell), xfce4-terminal title set to "▮ bero-os", and /etc/skel/ pre-baked with the brand prompt for any future user.
+
+Couple of small ruts:
+
+xfce4-terminal upstream URL is .tar.xz, not .tar.bz2 as my old batch-4 note said. First wget hit a 404. Fixed and retried.
+
+Red Hat Mono — github default branch is master not main. Repo also doesn't ship TTFs, only OTFs, and they live at fonts/Mono/RedHatMono/otf/ not the path APPLY-bero-os.md guessed. Took three wget attempts to land on the right tarball + path. Installed all 10 OTF faces (Regular, Medium, SemiBold, Bold + 4 italics + Light/LightItalic).
+
+Also established that /root/ config files get mirrored to configs/root/ in the repo from this batch on. First time we've tracked /root/ in git.
+
+That's it.

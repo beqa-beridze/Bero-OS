@@ -1,0 +1,17 @@
+[Configuration]
+ColorPalette=#0f0e0c;#c8102e;#8a9a5b;#d9a441;#6b8caf;#a87ca0;#7ea8a6;#e9dcc1;#4a463e;#e63950;#a4b376;#e9bd5e;#8aa5c6;#c19abd;#9bc2c1;#f5ecd6
+ColorForeground=#e9dcc1
+ColorBackground=#0f0e0c
+ColorCursor=#c8102e
+ColorBold=#f5ecd6
+ColorSelection=#2a2620
+ColorSelectionUseDefault=FALSE
+FontName=Red Hat Mono Medium 11
+ScrollingLines=10000
+MiscMenubarDefault=FALSE
+MiscToolbarDefault=FALSE
+MiscBordersDefault=FALSE
+MiscScrollbarVisibility=TRUE
+MiscCursorBlinks=TRUE
+TitleInitial=▮ bero-os
+TitleMode=TITLE_PREPENDS

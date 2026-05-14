@@ -1,0 +1,10 @@
+the manual is in /usr/share/doc — start there.
+two prompts. one shell. don't lose track of which is yours.
+if it compiles in 30 seconds you're not on bero-os.
+read before you grep.
+works on my machine = the X230.
+the kernel doesn't care about your feelings.
+back up before you visudo.
+the only good cron is one you remember writing.
+ldconfig is free. run it.
+no theme survives first contact with xfconf.
