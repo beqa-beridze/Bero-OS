@@ -85,3 +85,31 @@ Saw the XFCE desktop for the first time today.
 ## 2026-05-13
 
 Got XFCE booting today. Hit two surprise bugs at first boot — gdk-pixbuf was built without image loaders so the greeter couldn't draw, and lightdm 1.32.0 doesn't ship the session wrapper so we wrote our own. Both fixed. First time bero-os has a real desktop. 3am, going to sleep.
+
+## 2026-05-14
+
+Batch 5 done. Audio (pipewire + wireplumber + alsa-utils), network manager (NM + wpa_supplicant + libnl + libndp + iptables + nspr + nss), power (upower + acpid + xfce4-power-manager), plus a bunch of small deps. 22 packages total. Hit a bunch of bugs.
+
+NetworkManager refused to build three times in a row.
+
+First try: PyGObject wasn't installed and NM's build runs a Python script that does `import gi`. Got listed in the book as "Recommended" not "Required", easy to miss. Built PyGObject, retried.
+
+Second try: Python couldn't find the Gio typelib. Turns out libgirepository's compiled default search path only covers /usr/lib/girepository-1.0 but Gio's typelib is in /usr/lib64. We had GI_TYPELIB_PATH set in /etc/profile.d/ from a batch 4 fix, but that doesn't fire inside ninja's subprocess shells. Set it explicitly in the build env. Retried.
+
+Third try got to 957/970 and then xsltproc tried to fetch docbook XSL over the network for man pages. Same family of bug we hit twice in batch 4 with gtk3 and libsecret. Stopped working around it this time, just installed docbook-xml-4.5 + docbook-xsl-nons-1.79.2 properly and set up /etc/xml/catalog. Resumed the build from where it failed, finished in 5 minutes.
+
+acpid is the second package in this project that doesn't ship a systemd unit (after openssh in batch 4). Wrote one by hand.
+
+Rebooted. Three more bugs at first boot.
+
+nmcli wouldn't run — libnm.so.0 not in the linker cache. The NM install never ran ldconfig.
+
+upower wouldn't start, exit status 217/USER. Its systemd unit sets PrivateUsers=yes which needs CONFIG_USER_NS=y in the kernel. My kernel doesn't have it. Drop-in to set PrivateUsers=no. Adding USER_NS to the next kernel rebuild list.
+
+DNS was still using the fallback nameservers I put in pre-reboot. NM had written its own resolv.conf at /run/NetworkManager/resolv.conf but didn't touch /etc/resolv.conf. Symlinked /etc to /run. Done.
+
+Laptop also got a new IP from DHCP (.5 instead of .2). Whatever, NM owns the connection now.
+
+Finally fixed the /sbin PATH thing that's been deferred since batch 4. Two lines in /etc/profile.d/path.sh. Should have done it weeks ago.
+
+That's it.
