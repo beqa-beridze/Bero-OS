@@ -5,3 +5,4 @@
 # Source brand prompt + banner
 [ -r /etc/profile.d/bero-prompt.sh ] && . /etc/profile.d/bero-prompt.sh
 [ -r /etc/profile.d/bero-banner.sh ] && . /etc/profile.d/bero-banner.sh
+[ -r /etc/profile.d/bero-shell.sh ] && . /etc/profile.d/bero-shell.sh
