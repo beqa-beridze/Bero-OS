@@ -122,6 +122,12 @@ Wallpaper note for whoever does the brand v2 — the cursor order in the PNG is 
 
 Easter eggs in: TTY /etc/issue with the accent bar, /etc/motd ASCII for SSH, a first-shell brand banner in /etc/profile.d/bero-banner.sh that prints a random "workshop wisdom" line per session (sentinel in /tmp suppresses it after the first shell), xfce4-terminal title set to "▮ bero-os", and /etc/skel/ pre-baked with the brand prompt for any future user.
 
+## 2026-05-19
+
+Audit pass on the brand work caught a real one: the wallpaper-cursor-order issue I flagged in batch 6 was never actually a "designer ships a fix later" problem. The fix was already uploaded the SAME night, sitting in `~/Downloads/Bero-OS logo and wallpapers (1).zip` — a wallpaper-only re-export with the correct cursor order. I just never extracted it and never asked where it was. Extracted now (filenames had `bero-os-` prefix instead of `wallpaper-`; renamed during install to keep the existing convention). Overwrote `context/export/wallpaper-*.png` with the v2 set, rsync'd to `/usr/local/share/bero-os/`, forced xfdesktop to redraw via a clear-then-set xfconf trick.
+
+That JOURNAL note from batch 6 about the inconsistency is stale — leaving it in place but the situation is resolved.
+
 ## 2026-05-15
 
 XFCE polish pass. The default 2-panel + light-theme + drop-shadows everywhere look was straight out of 2009. Tightened it.
