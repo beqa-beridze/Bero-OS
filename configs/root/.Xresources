@@ -1,0 +1,28 @@
+! Bero-OS Workshop palette for xterm
+xterm*background:       #0f0e0c
+xterm*foreground:       #e9dcc1
+xterm*cursorColor:      #c8102e
+
+xterm*color0:           #0f0e0c
+xterm*color1:           #c8102e
+xterm*color2:           #8a9a5b
+xterm*color3:           #d9a441
+xterm*color4:           #6b8caf
+xterm*color5:           #a87ca0
+xterm*color6:           #7ea8a6
+xterm*color7:           #e9dcc1
+xterm*color8:           #4a463e
+xterm*color9:           #e63950
+xterm*color10:          #a4b376
+xterm*color11:          #e9bd5e
+xterm*color12:          #8aa5c6
+xterm*color13:          #c19abd
+xterm*color14:          #9bc2c1
+xterm*color15:          #f5ecd6
+
+xterm*faceName:         Red Hat Mono:style=Medium:size=11
+xterm*renderFont:       true
+xterm*selectToClipboard: true
+xterm*saveLines:        10000
+xterm*scrollBar:        false
+xterm*loginShell:       true
