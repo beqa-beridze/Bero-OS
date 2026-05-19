@@ -1,3 +1,13 @@
+<p align="center">
+  <img src=".brand/wordmark-on-dark-1x.png" width="320" alt="bero-os">
+</p>
+
+<p align="center">
+  <em>two prompts. one shell.</em>
+</p>
+
+---
+
 # Bero-OS
 
 Trying to turn an LFS project into a distro.

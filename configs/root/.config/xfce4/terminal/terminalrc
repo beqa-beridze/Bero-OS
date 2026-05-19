@@ -8,6 +8,7 @@ ColorBold=#f5ecd6
 ColorSelection=#2a2620
 ColorSelectionUseDefault=FALSE
 FontName=Red Hat Mono Medium 11
+BoldFontName=Red Hat Mono SemiBold 11
 ScrollingLines=10000
 MiscMenubarDefault=FALSE
 MiscToolbarDefault=FALSE
