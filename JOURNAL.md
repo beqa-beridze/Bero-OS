@@ -164,3 +164,41 @@ Red Hat Mono — github default branch is master not main. Repo also doesn't shi
 Also established that /root/ config files get mirrored to configs/root/ in the repo from this batch on. First time we've tracked /root/ in git.
 
 That's it.
+
+## 2026-05-22
+
+Kernel rebuild for audio. Three CONFIG flips: SND_HDA_CODEC_REALTEK=m, SND_HDA_CODEC_CONEXANT=m (only the right one will bind), USER_NS=y (finally drops the upower drop-in from batch 5).
+
+Set up a GRUB seatbelt first because the original install had exactly one kernel in /boot and one menuentry — if the new build panicked there was nothing to roll back to. Copied vmlinuz/System.map/config to .working suffixes, copied /lib/modules/6.18.10 to /lib/modules/6.18.10.working, added a second menuentry "bero-os FALLBACK -- pre-audio rebuild" pointing at the .working vmlinuz. Mirrored grub.cfg into configs/boot/grub/.
+
+Expected an incremental build — three small CONFIG flips on an already-built tree. Wrong. USER_NS=y invalidates autoconf.h and the rebuild cascades into near-full. 26 minutes on the X230, all four threads pegged. Exit 0. New vmlinuz 14.52 MB vs 14.50 working, modules dir grew from 2.2M to 3.0M with all 10 Realtek ALC* (260/262/268/269/.../882) + Conexant + generic .ko files installed.
+
+Path note: in newer kernels the codec modules moved from sound/pci/hda/ to sound/hda/codecs/. First verification grep checked the old path and came up empty for a moment.
+
+Boot the new kernel. uname says #2 SMP today. aplay -l: no soundcards. dmesg:
+    snd_hda_intel 0000:00:1b.0: bound 0000:00:02.0 (ops intel_audio_component_bind_ops)
+    snd_hda_intel 0000:00:1b.0: Cannot probe codecs, giving up
+
+That's the whole HDA story — two lines. Controller register reads 0 codecs on the bus. Adding codec drivers can't fix that, they need a codec to bind to. The original "controller fine, codec missing" diagnosis was probably seeing snd_hda_intel load without an obvious error and assuming the rest was fine. First time trying audio on this machine, no working baseline.
+
+Cold power cycle + BIOS audio verify: same result.
+
+Added snd_hda_intel.single_cmd=1 to the new-kernel menuentry only (fallback stays untouched). Standard X230 workaround that forces PIO mode for codec commands instead of DMA.
+
+Reboot. Big change in dmesg:
+    snd_hda_intel 0000:00:1b.0: spurious response 0x10ec0269:0x0, last cmd=0x0f0000
+    snd_hda_intel 0000:00:1b.0: spurious response 0x80862806:0x3, last cmd=0x300f0000
+    snd_hda_intel 0000:00:1b.0: spurious response 0x17aa21fa:0x0, last cmd=0x1f2000
+    ... more spurious ...
+    snd_hda_intel 0000:00:1b.0: Cannot probe codecs, giving up
+
+The codec is THERE. 0x10ec0269 = Realtek ALC269. 0x17aa21fa = Lenovo ThinkPad X230 subsystem ID. The HDA bus is alive and the codec is identifying itself as exactly what's expected on this hardware. single_cmd=1 woke up the conversation. But the responses come back out-of-sync with what the controller's waiting for — flagged as spurious — so the init handshake never completes. Still no card.
+
+Went from "codec dead" to "codec alive but talking out of step." Different problem. Hardware is confirmed alive, which was the big unknown.
+
+Parking for tonight. Three things to try next session:
+- snd_hda_intel.probe_mask=0x1 to only probe codec at addr 0 (skip the HDMI at addr 3) — cheapest fix attempt
+- drop single_cmd, try DMA mode with bdl_pos_adj/position_fix timing tweaks
+- boot fallback briefly for a comparison dmesg — would tell us if the codec-init failure is X230 hardware/BIOS or our build
+
+That's it.
