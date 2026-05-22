@@ -1,5 +1,13 @@
 # UPower build + post-install notes
 
+## Resolved (2026-05-22)
+
+Kernel rebuild #2 turned `CONFIG_USER_NS=y` on, so the `no-user-ns.conf`
+drop-in was retired. UPower now runs with upstream-default `PrivateUsers=yes`.
+The "Fix" + "When to revert" sections below are kept for posterity in case
+someone ever rebuilds the kernel without USER_NS — they tell you what
+symptoms to expect and how to mask the issue while you fix the real cause.
+
 ## Lesson learned (batch 5, 2026-05-14)
 
 The UPower 1.91.1 upstream systemd unit `/usr/lib/systemd/system/upower.service`
