@@ -26,6 +26,7 @@
         <value type="int" value="4"/>
         <value type="int" value="5"/>
         <value type="int" value="6"/>
+        <value type="int" value="16"/>
         <value type="int" value="7"/>
         <value type="int" value="8"/>
         <value type="int" value="9"/>
@@ -40,7 +41,7 @@
   </property>
   <property name="plugins" type="empty">
     <property name="plugin-1" type="string" value="whiskermenu">
-      <property name="button-icon" type="string" value="/usr/local/share/bero-os/logo-mark-128.png"/>
+      <property name="button-icon" type="string" value="/usr/local/share/bero-os/logo-mark-256-dark.png"/>
       <property name="button-title" type="string" value=""/>
       <property name="show-button-title" type="bool" value="false"/>
       <property name="show-app-actions" type="bool" value="true"/>
@@ -49,7 +50,9 @@
       <property name="favorites" type="array">
         <value type="string" value="xfce4-terminal.desktop"/>
         <value type="string" value="thunar.desktop"/>
-        <value type="string" value="mousepad.desktop"/>
+      </property>
+      <property name="recent" type="array">
+        <value type="string" value="firefox.desktop"/>
       </property>
     </property>
     <property name="plugin-2" type="string" value="separator">
@@ -121,6 +124,9 @@
       </property>
       <property name="show-username" type="bool" value="false"/>
       <property name="show-name" type="bool" value="false"/>
+    </property>
+    <property name="plugin-16" type="string" value="launcher">
+      <property name="items" type="string" value="firefox.desktop"/>
     </property>
   </property>
 </channel>
