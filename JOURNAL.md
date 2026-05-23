@@ -202,3 +202,99 @@ Parking for tonight. Three things to try next session:
 - boot fallback briefly for a comparison dmesg — would tell us if the codec-init failure is X230 hardware/BIOS or our build
 
 That's it.
+
+## 2026-05-22 (later)
+
+Came back same day to try the three options. Spent the first hour reading kernel source instead of trying parameters. Best decision of the day.
+
+The "spurious response" pattern was misleading me. Found it in `sound/hda/common/bind.c`:
+
+```
+static void request_codec_module(struct hda_codec *codec)
+{
+#ifdef MODULE
+    ...
+    if (mod)
+        request_module(mod);
+#endif
+}
+```
+
+The entire body is `#ifdef MODULE`. That flag gets set per-object-file at compile time. bind.c lives in snd-hda-codec, gated by `CONFIG_SND_HDA`. With `CONFIG_SND_HDA=y` (what we had), snd-hda-codec is built into vmlinuz, `#ifdef MODULE` is false, and `request_codec_module` is an empty stub. The kernel literally never asks for any codec driver. The .ko files just sit there.
+
+That's why rebuild #1 didn't fix anything. The codec drivers were the right thing to build but the wrong build target — `=m` instead of `=y`. Kconfig doesn't warn about the mismatch. `make olddefconfig` accepts it. Silent broken.
+
+Fix: flip `SND_HDA_CODEC_REALTEK` + `_LIB` + `_CONEXANT` + `SND_HDA_GENERIC` from `=m` to `=y`. `olddefconfig` auto-promotes all the individual `ALC*` children because they have `default y if EXPERT` and the parent is now y. Rebuild took ~20 min this time (mostly relinks, not full recompiles). New vmlinuz 14.63 MB vs 14.52 from rebuild #1. Removed the now-stale codec .ko files from `/lib/modules/6.18.10/kernel/sound/hda/codecs/`.
+
+Reboot. dmesg this time:
+
+```
+snd_hda_codec_alc269 hdaudioC0D0: ALC269VC: picked fixup for PCI SSID 17aa:21fa
+snd_hda_codec_alc269 hdaudioC0D0: autoconfig for ALC269VC: line_outs=1 (0x14/0x0/0x0/0x0/0x0) type:speaker
+input: HDA Intel PCH Headphone as ...
+input: HDA Intel PCH Mic as ...
+```
+
+`aplay -l` shows `card 0: PCH [HDA Intel PCH], device 0: ALC269VC Analog`. 
+
+speaker-test -f 440. ...still nothing.
+
+Second bug, codec-side: Auto-Mute Mode. ALC269 ships with the codec auto-muting the speaker when it thinks a headphone is connected, and the jack-detect on this unit was reporting a phantom headphone. Disabled it via `amixer -c 0 sset 'Auto-Mute Mode' Disabled`, ran `alsactl store`. The `alsa-restore.service` + `90-alsa-restore.rules` udev wiring picks the saved state up on every boot now. Verified across a reboot.
+
+Wrote the y/m gotcha up in `configs/build-notes/kernel-audio.md` and saved a reference memory so future-me doesn't repeat the misdiagnosis. Dropped `snd_hda_intel.single_cmd=1` from grub — that was a red herring all along, it doesn't change the codec's behavior, just shifts which code path logs "spurious response" when DMA-mode RIRB responses arrive without matching the driver's bookkeeping.
+
+Also retired the UPower no-user-ns drop-in. `USER_NS=y` came with rebuild #1, so `PrivateUsers=yes` (upstream-hardened default) works again. UPower runs with the full security posture now.
+
+Commits today: kernel rebuild #2 (`77d2889`) + upower retirement (`0d227b9`).
+
+## 2026-05-23
+
+A lot today. Audio working unlocked everything else.
+
+### Nix
+
+Installed Nix from the upstream installer, multi-user, `--no-channel-add` (flakes-first; don't want a stale nixpkgs channel sitting around). Pre-flight was clean — 205G free on /, systemd 259.1, USER_NS now in, all the standard tools present. Nix 2.34.7 install came down in a few minutes and `nix profile add nixpkgs#hello && hello` printed "Hello, world!"
+
+Latent bero-os bug surfaced as a side effect. /etc/profile.d/nix.sh sources nix-daemon.sh which prepends `~/.nix-profile/bin` and `/nix/var/nix/profiles/default/bin` to PATH. But /etc/profile.d/path.sh ran AFTER it alphabetically and did `PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin` — absolute, no preserving — clobbering nix.sh's work. Root saw `nix` because something else in their interactive shell rebuilt PATH; `bero` got nothing.
+
+Renamed path.sh → 00-path.sh so it sorts first and becomes the base; everything else (nix.sh, rustc.sh, anything future) safely prepends on top. Any drop-in that wants to extend PATH now Just Works. Would have bitten us on the next package too.
+
+Enabled flakes in `/etc/nix/nix.conf`, restarted nix-daemon, smoke-tested with `nix profile add nixpkgs#hello && hello` as root and `nix profile add nixpkgs#cowsay && cowsay "bero-os has nix"` as `bero`. Multi-user genuinely works.
+
+Commit: `875559f`.
+
+### Wifi
+
+Hardware was alive all along, just no profile. Intel Centrino Advanced-N 6205 AGN, iwlwifi + iwldvm modules loaded from rebuild #2 modules tree, firmware was already there from the early-batch firmware bundle. `nmcli device wifi list` saw 14+ networks on the first scan.
+
+Told nmcli to connect to [home network] with the password I had — wpa_supplicant rejected it. Twice. Pulled the actual saved PSK from kwallet on this laptop via `kwallet-query kdewallet -f "Network Management" -r "{uuid};802-11-wireless-security"`. Real password is `[redacted]` — lowercase d, not capital D. Connected, got DHCP 10.100.102.11, ping 1.1.1.1 ≈ 3.8 ms.
+
+Both ethernet (.5) and wifi (.11) up simultaneously, NM keeps both routes. Can unplug ethernet now.
+
+### Panel + terminal title bar
+
+Started looking at the top panel because it felt generic. Then noticed the bigger issue I'd been ignoring: xfce4-terminal opens with no title bar. No drag handle, no close button, just a borderless rectangle pinned to the corner of the screen.
+
+Spent a while in the wrong place. The legacy terminalrc had `MiscBordersDefault=FALSE`. Flipped it to TRUE. Didn't help. Killed all running xfce4-terminal instances, opened fresh — still no title bar. Mousepad and Thunar both had decorations, so it wasn't xfwm4 being broken globally.
+
+Found a second config: `/root/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-terminal.xml` has its own `misc-borders-default = false` and it overrides the legacy terminalrc file silently. Flipped it via xfconf-query, opened a new terminal, the workshop title bar finally showed up.
+
+For the panel itself, switched from top horizontal to a left vertical dock — "Workshop Rail." Whisker menu (with the bero-os mark as the menu icon), pinned launchers (terminal, thunar, mousepad, appfinder, later firefox), vertical icon-only tasklist, workspace pager, showdesktop, systray, stacked HH/MM clock, logout + lock buttons. Built xfce4-whiskermenu-plugin 2.10.0-dev from source (meson + ninja, ~5 min). Workshop dim background (`#4a463e`) so it reads warm-dark instead of pure black — found that the icons cover most of the panel area so the bg only shows in the gaps, widened the panel to 54 px so the color actually breathes.
+
+End of the iteration the consensus was: it's fine for now but looks like an OS from 2002. Saved a feedback memory telling future-me to do research on modern dock patterns (macOS, Plasma Latte, GNOME Dash-to-Dock, COSMIC, Hyprland+Waybar) BEFORE the next visual iteration. Don't touch panel visuals without that research pass.
+
+Commit: `b047954`.
+
+### Repo on the box + Firefox + Claude Code
+
+Pushed the day's work to github (`28d0646..b047954`). Cloned the repo onto bero-os at /root/Bero-OS — had to `ssh-keyscan github.com` first (bero-os didn't know the host key) then `ssh -A` to forward my agent. Quick.
+
+Firefox via Nix: `nix profile add nixpkgs#firefox`. Came down from cache.nixos.org. Mozilla Firefox 151.0.1.
+
+Claude Code via Nix: nixpkgs flags it as unfree (Anthropic ToS). First install needed `NIXPKGS_ALLOW_UNFREE=1 nix profile add --impure nixpkgs#claude-code`. `claude --version` → 2.1.146 (Claude Code). After verifying, set `allowUnfree=true` globally in `/root/.config/nixpkgs/config.nix` and mirrored to `/etc/skel` so future users inherit. Verified — `nix eval nixpkgs#claude-code.name` now works without the flag.
+
+Pinned Firefox as a 5th launcher in the Workshop Rail and swapped the whisker icon to the dark logo variant (the regular one had a white bg that showed through on the dark panel — looked weird). Firefox shows as a generic gear icon in the dock because the system icon theme can't resolve Nix's `firefox` icon name, but clicking it fires up Firefox just fine. Cosmetic, will sort out properly when the panel gets redesigned.
+
+Commit: `f76e794`.
+
+Calling it. Audio works, wifi works, nix works, claude code works on the box, panel is "fine for now." Plenty to do tomorrow.
