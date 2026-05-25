@@ -33,6 +33,9 @@ alias path='echo -e ${PATH//:/\\n}'
 alias reload='exec $SHELL -l'
 alias please='sudo'
 
+# Claude
+alias claude-yolo="claude --dangerously-skip-permissions"
+
 # Bero
 alias bero-info='bero info'
 alias workshop='bero workshop'
