@@ -298,3 +298,70 @@ Pinned Firefox as a 5th launcher in the Workshop Rail and swapped the whisker ic
 Commit: `f76e794`.
 
 Calling it. Audio works, wifi works, nix works, claude code works on the box, panel is "fine for now." Plenty to do tomorrow.
+
+## 2026-05-25 / 2026-05-26
+
+Made bero the primary user and unblocked icon themes. Two days bled together.
+
+### Bero as daily-driver
+
+Up until this point I'd been ssh-ing in as root and doing everything from /root/. Daily-driving root is the wrong move; switched to bero.
+
+- /root/.config → /home/bero/.config (XFCE branding, nixpkgs allowUnfree)
+- /root/.claude → /home/bero/.claude (claude sessions + memory, renamed project dir to -home-bero-Bero-OS)
+- /root/Bero-OS → /home/bero/Bero-OS (the repo)
+- chown -R bero everywhere
+- bero's git identity set
+- nix profile add --impure firefox claude-code AS bero (per-user profile)
+- /etc/lightdm/lightdm.conf autologin flipped root → bero
+
+The `claude-yolo` alias hadn't been working under `su bero` either. Two reasons: bero's ~/.bashrc was stale (predated the /etc/skel update that added the bero-shell.sh source line), and `su bero` without `-` runs a non-login shell which never reads /etc/profile.d/. Refreshed bero's .bashrc and added `/etc/bash.bashrc` sourcing of bero-shell.sh so non-login interactive shells get aliases too.
+
+Also force-pushed the history to strip the `Co-Authored-By: Claude` trailers I'd been adding. Tag pre-coauthor-cleanup left locally as a rollback point. Updated memory so future-Claude doesn't add the trailer again.
+
+### Tela icons (abandoned), then Papirus + red folders
+
+Started with Tela-circle-red-dark thinking the `red` variant gave red folders. It doesn't — Tela-circle is a SYMBOLIC theme, the "red" only changes accent overlays, the folder body itself stays monochrome outline. Inspected the actual SVG and confirmed.
+
+Switched to Papirus-Dark with papirus-folders. That worked — `papirus-folders -C red --theme Papirus-Dark` makes every folder.svg a symlink to folder-red.svg with fill #bf4b4b.
+
+Except none of this was VISIBLE. Same beige folders everywhere. The user kept saying "no change". Spent an hour trying every cache-rebuild trick before realizing what was actually wrong.
+
+### THE librsvg trap
+
+Found via a Python `Gtk.IconTheme.lookup_icon('folder', 48, 0)` test — GTK resolves it to `/org/gtk/libgtk/icons/16x16/actions/folder.png` (the GResource fallback baked into libgtk), even though Papirus's folder.svg is right there on disk. With `Gtk.IconLookupFlags.FORCE_SVG` the lookup correctly finds the Papirus file — meaning the file is fine, GTK just refuses to use it by default.
+
+Tested directly: `GdkPixbuf.Pixbuf.new_from_file('/usr/share/icons/Papirus-Dark/48x48/places/folder-red.svg')` → "Couldn't recognize the image file format". And `gdk-pixbuf-query-loaders | grep svg` returned nothing.
+
+So gdk-pixbuf had no SVG loader. Looked at `/sources/librsvg-2.61.4/meson_options.txt`:
+
+```
+option('pixbuf-loader',
+       type: 'feature',
+       value: 'disabled',
+       ...
+```
+
+**librsvg 2.61.4 ships with the pixbuf loader DISABLED by default.** Batch 4 used BLFS defaults so we never built `libpixbufloader_svg.so`. Every SVG-based icon theme — Adwaita, Tela, Papirus, all of them — has been silently falling back to the GResource PNGs for the entire lifetime of this project.
+
+Rebuilt librsvg with `-D pixbuf-loader=enabled`. 2 min Rust compile, install dropped the loader into /usr/lib64/gdk-pixbuf-2.0/2.10.0/loaders/ (named with an underscore — libpixbufloader_svg.so — not a dash like everything else). Update cache. Retest the lookup → resolves to the actual Papirus red folder. Restart Thunar → real red folders, real app icons in the dock. Years-old bug fixed.
+
+Same shape as the HDA codec y/m thing in May — a CONFIG default that silently disables something downstream and you don't notice until much later. Wrote it up in `configs/build-notes/librsvg-pixbuf-loader.md` and saved a reference memory.
+
+### Catppuccin Mocha Red Dark
+
+For the title bar / GTK theme refresh. Cloned the GTK-Theme repo, installed sassc via nix, built with `-t red -c dark --tweaks black`. Set it as both xsettings theme and xfwm4 theme. Dropped the menu button (`button_layout = |SHMC`), set title font to `Red Hat Mono SemiBold 10` to match the workshop voice.
+
+Looks fine. Title bar has actual contrast against the terminal interior now, monospace title text reads as workshop.
+
+### Known issues parked
+
+- **Tasklist icons not rendering** in the dock. Labels work (text shows when `show-labels=true`), icons don't. _NET_WM_ICON is set on the windows, libwnck-3 loads, but the pixmap-to-button conversion produces empty. Theme-agnostic — same on Adwaita-dark. Probably an xfce4-panel 4.20.6 vertical-mode bug. Living with empty slots.
+- **Catppuccin close button doesn't go red on hover**, just brightens. Need a different theme or hand-edit the PNGs. Parked.
+- **Cursor theme still default** chunky X11 arrow. Bibata or Capitaine deferred, still deferred.
+
+### Closeout
+
+Built a `/closeout` slash-command skill in `~/.claude/skills/closeout/` so I can run this end-of-session ritual reliably going forward (pull configs to repo, write build-notes, update memory, JOURNAL, commit + push).
+
+Calling it. Desktop looks legitimately better than 6 hours ago — Papirus icons everywhere, Catppuccin title bars, monospace title text, clean left edge. Still a v1 panel and a couple of icon bugs to chase, but daily-driveable.
