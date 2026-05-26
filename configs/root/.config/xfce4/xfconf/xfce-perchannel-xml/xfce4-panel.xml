@@ -24,9 +24,7 @@
         <value type="int" value="2"/>
         <value type="int" value="3"/>
         <value type="int" value="4"/>
-        <value type="int" value="5"/>
         <value type="int" value="6"/>
-        <value type="int" value="16"/>
         <value type="int" value="7"/>
         <value type="int" value="8"/>
         <value type="int" value="9"/>
@@ -68,9 +66,6 @@
         <value type="string" value="17794884442.desktop"/>
       </property>
     </property>
-    <property name="plugin-5" type="string" value="launcher">
-      <property name="items" type="string" value="org.xfce.mousepad.desktop"/>
-    </property>
     <property name="plugin-6" type="string" value="launcher">
       <property name="items" type="array">
         <value type="string" value="17794884443.desktop"/>
@@ -83,6 +78,10 @@
       <property name="grouping" type="uint" value="1"/>
       <property name="show-labels" type="bool" value="false"/>
       <property name="show-handle" type="bool" value="false"/>
+      <property name="flat-buttons" type="bool" value="true"/>
+      <property name="include-all-workspaces" type="bool" value="false"/>
+      <property name="show-only-minimized" type="bool" value="false"/>
+      <property name="expand" type="bool" value="false"/>
     </property>
     <property name="plugin-9" type="string" value="separator">
       <property name="expand" type="bool" value="true"/>
@@ -124,9 +123,6 @@
       </property>
       <property name="show-username" type="bool" value="false"/>
       <property name="show-name" type="bool" value="false"/>
-    </property>
-    <property name="plugin-16" type="string" value="launcher">
-      <property name="items" type="string" value="firefox.desktop"/>
     </property>
   </property>
 </channel>
