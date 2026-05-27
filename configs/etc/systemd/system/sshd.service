@@ -5,6 +5,7 @@ Wants=network-online.target
 
 [Service]
 Type=simple
+ExecStartPre=/bin/sh -c '[ -f /etc/ssh/ssh_host_ed25519_key ] || /usr/bin/ssh-keygen -A'
 ExecStartPre=/usr/sbin/sshd -t
 ExecStart=/usr/sbin/sshd -D
 ExecReload=/bin/kill -HUP $MAINPID
