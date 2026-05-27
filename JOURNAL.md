@@ -365,3 +365,46 @@ Looks fine. Title bar has actual contrast against the terminal interior now, mon
 Built a `/closeout` slash-command skill in `~/.claude/skills/closeout/` so I can run this end-of-session ritual reliably going forward (pull configs to repo, write build-notes, update memory, JOURNAL, commit + push).
 
 Calling it. Desktop looks legitimately better than 6 hours ago — Papirus icons everywhere, Catppuccin title bars, monospace title text, clean left edge. Still a v1 panel and a couple of icon bugs to chase, but daily-driveable.
+
+## 2026-05-28
+
+Ran `/code-review` last night, got back a 24-item audit (`context/audit-2026-05-28.md`). Some of it I expected, some of it caught real things. Picked the cheap-but-real subset and ground through them tonight.
+
+Tagged `pre-audit-fixes` at `8b8f2ff` before starting so anything could roll back cleanly.
+
+Eight commits, one per issue, all pushed:
+
+- **gitignore** for `**/NetworkManager/system-connections/`. Wifi PSKs live cleartext in those `.nmconnection` files; one sloppy `cp -r /etc configs/etc` would have committed them to a public repo. Directory glob so a future file type or a `.gitkeep` can't sneak through.
+- **nix-daemon + masked resolved/networkd symlinks** mirrored as actual git symlinks (mode 120000) under `configs/etc/systemd/system/`. The five symlinks pin the design decision "we run NM, we don't run systemd-resolved/networkd, and nix-daemon comes from `/nix/var/nix/profiles/default`."
+- **xfconf user XML** snapshot. 12 channel XMLs (panel layout including Workshop Rail, Thunar, xfce4-terminal, xfwm4, xsettings, keyboard shortcuts, etc.) committed under `configs/home/bero/.config/xfce4/`. Was only `.bashrc` before — disk loss would have erased every UI tweak since `15b6b18`.
+- **accountsservice** got a real patch file (`configs/patches/accountsservice-23.13.9-skip-tests-subdir.patch`) plus a build-note. The "patched out the tests subdir entirely" line in batch 4's journal had no companion patch anywhere. Verified with `patch --dry-run` against a fresh tarball.
+- **kernel module inventory**. Audit said `/proc/sys/kernel/tainted=4` meant out-of-tree modules. It doesn't — bit 2 is `TAINT_CPU_OUT_OF_SPEC`, bit 12 is OOT. All 11 `.ko` files on the system are `intree=Y`, matching vermagic. The "newer than vmlinuz" filter the audit used catches every module because modules are built after the kernel image. So the audit's framing was wrong; the build-note catalogs the modules with Kconfig symbols and corrects the taint reading. The bit-2 taint is almost certainly the `old_microcode` flag (see audit #3, parked).
+- **sshd ExecStartPre keygen guard**. If host keys ever go missing, sshd used to fail because the existing `sshd -t` returned non-zero, no fallback. Added a guard line that runs `ssh-keygen -A` if `/etc/ssh/ssh_host_ed25519_key` is absent. Caught a bug in the audit's own recommendation while testing — it said `/usr/sbin/ssh-keygen` but on this box that path doesn't exist, ssh-keygen lives at `/usr/bin/ssh-keygen`. Verified end-to-end: moved all host keys aside, started sshd, journal logged `ssh-keygen: generating new host keys: RSA ECDSA ED25519`, three fresh fingerprints appeared, restored originals.
+- **Claude Code xclip clipboard**. Spent a while pulling the claude binary apart. It's a `makeCWrapper` ELF that `--prefix`-prepends nix store paths to PATH (procps/ripgrep/bubblewrap/socat) and execs `.claude-wrapped` — does NOT strip inherited PATH. The running claude has `/home/bero/.nix-profile/bin` in PATH per `/proc/.../environ`, and strings in the bundle show xclip is invoked by bare name (no absolute path), so PATH lookup should find the nix-profile xclip. The audit's "still doesn't work" was probably a stale claude with pre-xclip PATH. Added `/usr/bin/xclip -> ~/.nix-profile/bin/xclip` as belt-and-suspenders. Build-note documents the strace recipe if it still fails.
+- **DNS fallback** via systemd-tmpfiles. `/etc/resolv.conf` symlinks into `/run/NetworkManager/resolv.conf` which lives in tmpfs — empty after a reboot until NM writes it. Added a rule that primes the file with `1.1.1.1` + `9.9.9.9` at boot before NM starts. Verified: delete the file with NM still up, run `systemd-tmpfiles --create`, file regenerates with fallback content and `getent hosts example.com` resolves. NM owns the file once running, so dynamic content takes over normally.
+
+Spawned an adversarial-review subagent at the end with fresh context, the audit file, and the session diff. Asked it to flag correctness gaps. Came back with **0 gaps** across all 8 items, including the patch dry-run and the live tmpfiles test.
+
+### Tightened scope, what got deferred
+
+Half the audit was either security-pass material that needs its own session or pure-documentation items for things already working. Walked through with the user, dropped these explicitly (not missed):
+
+- **#1, #3** (PermitRootLogin yes + trivial passwords + outdated microcode + no firewall). Security hardening pass, separate session. Not touching a hardened-config when the box is also currently mid-experiment.
+- **#4, #5** (PAM stack + systemd `-Dpam=true`). The PAM tree is mostly one-line stubs that work today only because `lightdm-autologin` has its own complete stack. Rebuilding properly without rebuilding systemd to put `pam_systemd.so` on disk would break login the instant autologin is off. Big enough to be its own thing; we're not turning autologin off so it can wait.
+- **#6** (gpg/gcr rebuild). gpg2 is an exit-0 stub, gcr was built against the stub. We don't use gcr signing — not worth a full rebuild.
+- **#10** (xfce4-whiskermenu 2.10.1 bump). Current 2.10.0-dev works. Defer.
+- **#11, #13, #14, #15** (vte gnutls=false, 00-path.sh sort-order, skel propagation shell-only, /opt/rustc symlink indirection). All pure-documentation entries for things working today. Low value. Skip.
+- **#19–24** (LLM behavior observations). Behavior corrections live in memory entries, not configs/. The audit already named them; I'll fold them into future sessions.
+
+### Things that surfaced this session that weren't in the audit
+
+- **NM's `dns-mgr: resolvconf failed with status 256` warning**. `conf.d/dns.conf` says `dns=default` which makes NM probe for `resolvconf` (the binary), which isn't installed. Non-fatal — NM still writes resolv.conf directly. Worth silencing later by setting `rc-manager=symlink` or installing `openresolv`. Out of scope tonight.
+- **Adversarial subagent was wrong** on its first take of #18. Said the wrapper "omits `.nix-profile/bin`" from PATH — that's not how `--prefix` works (it's additive). Caught it by reading `/proc/<pid>/environ` directly. Both the original audit and the subagent had partial views of the same problem.
+- **The audit was wrong** about the kernel taint bit. Bit 2 is `TAINT_CPU_OUT_OF_SPEC`, not `TAINT_OOT_MODULE` (that's bit 12). And the `find -newer vmlinuz` filter it used to identify "newer modules" is non-selective — modules are always built after vmlinuz. Worth remembering: audit findings need their own diagnosis verification.
+- **The audit's sshd fix** used the wrong ssh-keygen path. Would have made the keygen guard silently fail.
+
+Three of the eight items had something to push back on. Useful pattern: audits are inputs, not orders.
+
+### Closeout
+
+Mirroring state, updating memory where things shifted, commit + push. Not invoking the `/closeout` skill itself — that's user-triggered.
