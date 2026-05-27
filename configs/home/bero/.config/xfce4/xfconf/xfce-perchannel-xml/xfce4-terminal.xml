@@ -1,0 +1,20 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<channel name="xfce4-terminal" version="1.0">
+  <property name="color-foreground" type="string" value="#e9dcc1"/>
+  <property name="color-background" type="string" value="#0f0e0c"/>
+  <property name="color-cursor" type="string" value="#c8102e"/>
+  <property name="color-selection" type="string" value="#2a2620"/>
+  <property name="color-selection-use-default" type="bool" value="false"/>
+  <property name="color-bold" type="string" value="#f5ecd6"/>
+  <property name="color-palette" type="string" value="#0f0e0c;#c8102e;#8a9a5b;#d9a441;#6b8caf;#a87ca0;#7ea8a6;#e9dcc1;#4a463e;#e63950;#a4b376;#e9bd5e;#8aa5c6;#c19abd;#9bc2c1;#f5ecd6"/>
+  <property name="font-name" type="string" value="Red Hat Mono Medium 11"/>
+  <property name="misc-borders-default" type="bool" value="true"/>
+  <property name="misc-cursor-blinks" type="bool" value="true"/>
+  <property name="misc-menubar-default" type="bool" value="false"/>
+  <property name="misc-toolbar-default" type="bool" value="false"/>
+  <property name="scrolling-lines" type="uint" value="10000"/>
+  <property name="title-initial" type="string" value="▮ bero-os"/>
+  <property name="title-mode" type="string" value="TERMINAL_TITLE_REPLACE"/>
+  <property name="misc-confirm-close" type="bool" value="false"/>
+</channel>
