@@ -1,2 +1,5 @@
 context/
 .claude/
+
+# NetworkManager wifi secrets — never commit
+**/NetworkManager/system-connections/
