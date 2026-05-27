@@ -1,0 +1,28 @@
+Subject: skip tests subdir to avoid pygobject + python-dbusmock build deps
+From:    Bero-OS batch 4
+Date:    2026-05-12
+
+accountsservice's tests/ subdir hard-requires python3 modules `gi` (PyGObject)
+and `dbusmock`. These are heavy transitive deps that weren't worth chasing
+just to compile a daemon we use at runtime (no test executions needed).
+
+BLFS-recommended workaround is `mv tests/dbusmock{,-tests}` plus a sed, but
+that still needs the Python modules to be installed. This patch removes the
+subdir entirely, skipping all tests. accounts-daemon + libaccountsservice
+still build and install.
+
+Re-apply on rebuild from a clean tarball:
+    cd /sources/accountsservice-23.13.9
+    patch -p1 < /path/to/configs/patches/accountsservice-23.13.9-skip-tests-subdir.patch
+
+--- a/meson.build
++++ b/meson.build
+@@ -232,7 +232,7 @@
+   subdir('doc/libaccountsservice')
+ endif
+
+-subdir('tests')
++# subdir('tests')  # Bero-OS: tests need pygobject + python-dbusmock; skipped
+
+ configure_file(
+   output: 'config.h',
