@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Kitty
+GenericName=Terminal
+Comment=GPU-accelerated terminal with alt-screen scrollback (Konsole-like)
+Icon=utilities-terminal
+Exec=/usr/local/bin/kitty
+Terminal=false
+Categories=System;TerminalEmulator;
+Keywords=shell;prompt;command;commandline;cmd;terminal;
+StartupWMClass=kitty

@@ -1,0 +1,7 @@
+#!/bin/bash
+# Bero-OS wrapper: launches nix-installed Kitty via nixGLIntel so the
+# bundled libGLX can talk to our Intel HD 4000 X server.
+# (Plain `kitty` fails with "No GLXFBConfigs returned" on non-NixOS.)
+exec env NIXPKGS_ALLOW_UNFREE=1 \
+    /nix/var/nix/profiles/default/bin/nix run --impure github:nix-community/nixGL#nixGLIntel -- \
+    /home/bero/.nix-profile/bin/kitty "$@"
