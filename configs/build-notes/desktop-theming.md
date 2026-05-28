@@ -80,12 +80,15 @@ gtk-update-icon-cache -f -t /usr/share/icons/Papirus-Dark'
 
 ## Known issues (parked)
 
-1. **Panel tasklist shows no icons** even though `_NET_WM_ICON` is set on
-   each window, libwnck-3 is loaded, and the tasklist plugin is rendering
-   buttons (labels work when `show-labels=true`). Suspect a vertical-mode
-   tasklist icon-size calculation bug in xfce4-panel 4.20.6. Workaround:
-   set `show-labels=true` to at least see app names; or live with empty
-   slots.
+1. **~~Panel tasklist shows no icons~~** — RESOLVED 2026-05-28. Root cause
+   was NOT a vertical-mode xfce4-panel bug. gdk-pixbuf had been built
+   without the BMP loader (`-D others=enabled` missing) so
+   libxfce4windowing's `xfw_window_get_icon()` returned NULL for every
+   window (it packages _NET_WM_ICON as in-memory BMP-with-alpha, then
+   asks gdk-pixbuf to decode). xfce4-terminal worked by accident because
+   it took the `xfw_application_get_icon()` (icon-theme-by-name) code
+   path instead. Fix: rebuild gdk-pixbuf with `-D others=enabled` per
+   `gdk-pixbuf.md`. See memory [[gdk-pixbuf-others-loaders-must-be-enabled]].
 
 2. **xfwm4 close/min/max buttons are subtle** — Catppuccin ships them as
    36×34 8-bit-colormap PNGs without alpha. xfwm4 renders them but they
