@@ -1,0 +1,44 @@
+/* Bero-OS Workshop accent overrides for Adwaita */
+@define-color accent_bg_color   #c8102e;
+@define-color accent_color      #c8102e;
+@define-color theme_selected_bg_color #c8102e;
+
+/* Make scrollbars actually visible — Catppuccin defaults to 6px thin slivers
+   that disappear into the background, AND its :disabled state goes
+   ultra-transparent. We override aggressively so the bar always renders,
+   even when on the alternate-screen buffer (TUI apps like Claude Code, less,
+   htop) where there's no actual scrollback to scroll. */
+
+/* Force the scrolledwindow + trough to allocate space */
+scrolledwindow scrollbar,
+scrollbar {
+  min-width: 16px;
+  min-height: 16px;
+  -GtkScrollbar-has-backward-stepper: false;
+  -GtkScrollbar-has-forward-stepper: false;
+  background-color: rgba(74, 70, 62, 0.6);
+  opacity: 1.0;
+}
+scrollbar trough {
+  min-width: 16px;
+  min-height: 16px;
+  background-color: rgba(74, 70, 62, 0.6);
+}
+scrollbar slider {
+  min-width: 14px;
+  min-height: 14px;
+  margin: 1px;
+  border-radius: 8px;
+  background-color: rgba(232, 220, 193, 0.55);
+}
+scrollbar slider:hover {
+  background-color: rgba(200, 16, 46, 0.85);
+}
+scrollbar slider:active {
+  background-color: #c8102e;
+}
+scrollbar slider:disabled {
+  min-width: 14px;
+  min-height: 14px;
+  background-color: rgba(232, 220, 193, 0.25);
+}
