@@ -86,7 +86,6 @@ A [self-audit against the BLFS book](docs/usable-base-audit-2026-05-31.md) in la
 
 - The security base is a single-user convenience setup: root can SSH in with a password, there's no firewall because the kernel has no netfilter tables yet, GnuPG is a stub, and the PAM stack is minimal. All known, all planned as one coordinated hardening pass.
 - The graphical session isn't registered with logind, because `pam_systemd.so` was never installed into PAM's module directory. Things work through fallbacks.
-- The UI still renders in Luxi Sans because no proportional Noto or Liberation family was installed. The engine underneath (FreeType, HarfBuzz, fontconfig) is fine.
 - No FUSE, exFAT or NTFS in the kernel, so removable media is FAT-only. One kernel rebuild fixes it, along with `THINKPAD_ACPI` for the Fn keys.
 - The dock is a v1. It works, it looks like it's from 2002.
 
