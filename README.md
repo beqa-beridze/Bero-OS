@@ -15,7 +15,7 @@ A Linux distribution I built from source, one package at a time, on a 2012 Think
 It boots, it runs a desktop, it gets on wifi, it plays sound, and I daily-drive it from the laptop it lives on. Everything on the box that isn't a stock upstream file is mirrored in this repo.
 
 <p align="center">
-  <img src="docs/screenshots/desktop-2026-09-13.png" width="820" alt="bero-os desktop: XFCE with the Workshop Rail dock and the branded terminal">
+  <img src="docs/screenshots/desktop-2026-09-13.png" width="820" alt="bero-os desktop: the Workshop Rail dock and the bero CLI in the branded terminal">
 </p>
 
 ## What's actually in it
@@ -31,10 +31,6 @@ It boots, it runs a desktop, it gets on wifi, it plays sound, and I daily-drive 
 | Package layer | Nix 2.34, multi-user, flakes-first. Firefox and Claude Code come from nixpkgs, everything else is compiled here |
 | Toolchain | Rust 1.93, Python 3.14, Perl 5.42, cmake, meson, ninja. Around 300 packages in `/sources` |
 | Brand | A palette, a two-cursor mark, Red Hat Mono everywhere, a `bero` CLI, and a few easter eggs I'm not going to list |
-
-<p align="center">
-  <img src="docs/screenshots/bero-cli.png" width="700" alt="the bero CLI: info, art, palette, fortune">
-</p>
 
 ## How the repo works
 
@@ -96,7 +92,7 @@ A self-audit against the BLFS book in late May found the gaps honestly. The big 
 
 ## Hardware
 
-ThinkPad X230. Intel i5-3320M, 16 GB RAM, 240 GB SSD, 1366x768 panel, Intel Centrino Advanced-N 6205 wifi, Realtek ALC269VC audio.
+ThinkPad X230. Intel i5-3320M, 16 GB RAM, 256 GB SanDisk SSD, 1366x768 panel, Intel Centrino Advanced-N 6205 wifi, Realtek ALC269VC audio.
 
 ## Brand
 
