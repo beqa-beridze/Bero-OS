@@ -14,6 +14,10 @@ A Linux distribution I built from source, one package at a time, on a 2012 Think
 
 It boots, it runs a desktop, it gets on wifi, it plays sound, and I daily-drive it from the laptop it lives on. Everything on the box that isn't a stock upstream file is mirrored in this repo.
 
+**Where it stands right now:** the project has been paused for a couple of months while I took time for other things, including moving countries. I plan to come back to it soon, with a fresher head and after learning more about Linux and the wider stack, because there is a lot of the system I built without fully understanding yet and I want to close that gap before building further.
+
+**About the AI part, because it's the whole point:** I built this with AI help. Claude Code did a lot of the repetitive work, downloading, configuring, running the book's steps, while I did the reading, the diagnosis and the decisions. That's not a footnote, it's the idea. The name of the mark, *two prompts, one shell*, means exactly that: one prompt is mine, one belongs to an AI agent, and they share the same machine. The long-term plan is a system built from the ground up to be run together with an agent, where the agent is a first-class operator of the box rather than a chat window bolted on top. The LFS base is the part where I make sure I understand the machine well enough to hand half of it to something else.
+
 <p align="center">
   <img src="docs/screenshots/desktop-2026-09-13.png" width="820" alt="bero-os desktop: the Workshop Rail dock and the bero CLI in the branded terminal">
 </p>
@@ -71,7 +75,7 @@ These are the part of the repo I'd actually point someone at. Each one is a prob
 
 ## How I work on it
 
-I build on the X230 itself, over SSH from my daily driver. Long compiles run in the background while I do other things. I use Claude Code as a build assistant for the repetitive parts, downloading, configuring, running the book's steps, and I do the diagnosis and the decisions. Every non-obvious fix gets a build note. Every session gets a journal entry. Nothing is installed without being mirrored back.
+I build on the X230 itself, over SSH from my daily driver. Long compiles run in the background while I do other things. Every non-obvious fix gets a build note. Every session gets a journal entry. Nothing is installed without being mirrored back.
 
 Some rules I set for myself early and kept:
 
