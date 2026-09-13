@@ -408,3 +408,19 @@ Three of the eight items had something to push back on. Useful pattern: audits a
 ### Closeout
 
 Mirroring state, updating memory where things shifted, commit + push. Not invoking the `/closeout` skill itself — that's user-triggered.
+
+## 2026-09-13
+
+First time I've touched this thing since May. The X230 came with me to Tbilisi and has been sitting closed in a bag for three months, which is somehow the longest uptime gap it's had since I built it.
+
+Picked off the cheap stuff from the May 31 audit — the items that were annoying rather than hard.
+
+Fonts first. Turns out every proportional font on the box was a Luxi face from the nineties, because back in May I only ever installed monospace and emoji. So the whole desktop, every menu, every web page, has been rendering in a font I never chose and actively disliked. Installed the Liberation family and the normal Noto sans/serif, plus the Georgian ones since I'm living here now and it'd be nice if Georgian text didn't come out as boxes. Immediately better. Anything already open keeps the old fonts until you restart it, same trap as last time.
+
+Then the desktop plumbing. No xdg-open, no way to look up which app opens what — which explains a few things that "just didn't work" and that I'd assumed were XFCE being XFCE. All three of the little xdg packages are in now, plus a real `which`, which the box has never had outside of Nix.
+
+Two small fights. The official download host for one of the packages started returning a teapot error to anything that isn't a browser, so I pulled the source straight from their GitLab instead. And xdg-utils insists on a documentation toolchain I don't have and don't want — and it doesn't just build the man pages with it, it uses it to generate the scripts' own help text, so without it you get no scripts at all. Wrote a tiny converter to produce the help text and built only the parts I care about. Man pages missing, everything else works.
+
+Also fixed the password helper's permissions, which were wrong since May and would have bitten me the first time I locked the screen. And set the clock to Tbilisi, which is the most honest thing in this entry.
+
+Left a build note with all the details. Good session for an hour's work.
