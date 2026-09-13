@@ -82,7 +82,7 @@ Some rules I set for myself early and kept:
 
 ## What's not done
 
-A self-audit against the BLFS book in late May found the gaps honestly. The big ones, still open:
+A [self-audit against the BLFS book](docs/usable-base-audit-2026-05-31.md) in late May found the gaps honestly. The big ones, still open:
 
 - The security base is a single-user convenience setup: root can SSH in with a password, there's no firewall because the kernel has no netfilter tables yet, GnuPG is a stub, and the PAM stack is minimal. All known, all planned as one coordinated hardening pass.
 - The graphical session isn't registered with logind, because `pam_systemd.so` was never installed into PAM's module directory. Things work through fallbacks.
