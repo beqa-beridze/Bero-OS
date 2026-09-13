@@ -267,7 +267,7 @@ Commit: `875559f`.
 
 Hardware was alive all along, just no profile. Intel Centrino Advanced-N 6205 AGN, iwlwifi + iwldvm modules loaded from rebuild #2 modules tree, firmware was already there from the early-batch firmware bundle. `nmcli device wifi list` saw 14+ networks on the first scan.
 
-Told nmcli to connect to [home network] with the password I had — wpa_supplicant rejected it. Twice. Pulled the actual saved PSK from kwallet on this laptop via `kwallet-query kdewallet -f "Network Management" -r "{uuid};802-11-wireless-security"`. Real password is `[redacted]` — lowercase d, not capital D. Connected, got DHCP 10.100.102.11, ping 1.1.1.1 ≈ 3.8 ms.
+Told nmcli to connect to the home network with the password I had — wpa_supplicant rejected it. Twice. Pulled the actual saved PSK from kwallet on this laptop via `kwallet-query kdewallet -f "Network Management" -r "{uuid};802-11-wireless-security"`. Turned out I had the capitalisation wrong on the first letter. Connected, got DHCP 10.100.102.11, ping 1.1.1.1 ≈ 3.8 ms.
 
 Both ethernet (.5) and wifi (.11) up simultaneously, NM keeps both routes. Can unplug ethernet now.
 

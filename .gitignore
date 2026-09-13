@@ -3,3 +3,4 @@ context/
 
 # NetworkManager wifi secrets — never commit
 **/NetworkManager/system-connections/
+.hermes/
